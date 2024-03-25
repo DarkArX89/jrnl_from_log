@@ -1,0 +1,6 @@
+beautifulsoup4==4.12.2
+et-xmlfile==1.1.0
+lxml==4.9.3
+openpyxl==3.1.2
+PySimpleGUI==4.60.5
+soupsieve==2.5
