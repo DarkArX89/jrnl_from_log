@@ -1,4 +1,3 @@
-import time
 import datetime as dt
 import configparser
 import PySimpleGUI as sg
@@ -28,7 +27,7 @@ def time_to_timezone(time):
     '''
     Функция приводит время к нужному часовому поясу.
     Т.к. не было необходимости проверять пограничные значения при смене дня -
-    просто прибавляет значение TIME_ZONE ко времени. 
+    просто прибавляет значение TIME_ZONE ко времени.
     '''
     hour = str(int(time[:2]) + int(TIME_ZONE))
     if len(hour) < 2:
@@ -59,7 +58,7 @@ def parse_log(log_name, day):
     with open(full_name, 'r', encoding=ENCODING) as f:
         log = f.read()
     log_soup = BeautifulSoup(log, 'html.parser')
-    
+
     input_set = set()
     output_set = set()
 
@@ -70,7 +69,8 @@ def parse_log(log_name, day):
         date = date_from_log(time)
         if date == day:
             # извлекаем имя файла
-            filename = tag.find('wm-attachment-filename') or tag.find('wm-file-path')
+            filename = tag.find('wm-attachment-filename') or tag.find(
+                'wm-file-path')
             if filename is None:
                 continue
 
@@ -142,18 +142,30 @@ if __name__ == '__main__':
 
     # создаём окно интерфейса
     layout = [
-        [sg.Push(), sg.Text('Каталог log-файлов:'), sg.InputText(LOG_CATALOG), sg.FolderBrowse()],
-        [sg.Push(), sg.Text('Каталог с журналами:'), sg.InputText(JRNL_CATALOG), sg.FolderBrowse()],
-        [sg.Push(), sg.Text('Кодировка журналов:'), sg.InputText(ENCODING)],
-        [sg.Push(), sg.Text('Ответственный:'), sg.InputText(USERNAME)],
-        [sg.Push(), sg.Text('Часовой пояс:'), sg.InputText(TIME_ZONE)],
-        [sg.Push(), sg.Text('Дата создаваемого журнала:'), sg.InputText(day)],
-        [sg.Push(), sg.Text('Стартовый номер входящих фалов:'), sg.InputText(START_INPUT_NUMBER)],
-        [sg.Push(), sg.Text('Стартовый номер исходящих фалов:'), sg.InputText(START_OUTPUT_NUMBER)],
+        [sg.Push(), sg.Text('Каталог log-файлов:'),
+         sg.InputText(LOG_CATALOG), sg.FolderBrowse()],
+        [sg.Push(), sg.Text('Каталог с журналами:'),
+         sg.InputText(JRNL_CATALOG), sg.FolderBrowse()],
+        [sg.Push(), sg.Text('Кодировка журналов:'),
+         sg.InputText(ENCODING)],
+        [sg.Push(), sg.Text('Ответственный:'),
+         sg.InputText(USERNAME)],
+        [sg.Push(), sg.Text('Часовой пояс:'),
+         sg.InputText(TIME_ZONE)],
+        [sg.Push(), sg.Text('Дата создаваемого журнала:'),
+         sg.InputText(day)],
+        [sg.Push(), sg.Text('Стартовый номер входящих фалов:'),
+         sg.InputText(START_INPUT_NUMBER)],
+        [sg.Push(), sg.Text('Стартовый номер исходящих фалов:'),
+         sg.InputText(START_OUTPUT_NUMBER)],
         [sg.Output(size=(80, 10), key='-OUTPUT-')],
         [sg.Button('Сформировать'), sg.Button('Выход')]
     ]
-    window = sg.Window('Формирование журналов входящих/исхоящих файлов VipNet', layout, size=(590, 430))
+    window = sg.Window(
+        'Формирование журналов входящих/исхоящих файлов VipNet',
+        layout,
+        size=(590, 430)
+    )
 
     config_change = False
     while True:
@@ -171,56 +183,62 @@ if __name__ == '__main__':
                 else:
                     LOG_CATALOG = values[0]
                     config_change = True
-                    print(f'ВНИМАНИЕ: каталог Log-файлов изменён на {values[0]}')
+                    print('ВНИМАНИЕ: каталог Log-файлов изменён на '
+                          f'{LOG_CATALOG}')
             if values[1] != JRNL_CATALOG:
                 if not isdir(values[1]):
                     print('НЕВЕРНО УКАЗАН КАТАЛОГ С ЖУРНАЛАМИ: такого '
                           'каталога не существует!')
                 else:
-                    JRNL_CATALOG = values[0]
+                    JRNL_CATALOG = values[1]
                     config_change = True
-                    print(f'ВНИМАНИЕ: каталог с журналами изменён на {values[1]}')
+                    print('ВНИМАНИЕ: каталог с журналами изменён на '
+                          f'{JRNL_CATALOG}')
             if values[2] != ENCODING:
                 ENCODING = values[2]
                 config_change = True
-                print(f'ВНИМАНИЕ: кодировка изменена на {values[3]}!'
+                print(f'ВНИМАНИЕ: кодировка изменена на {ENCODING}!'
                       'Если такой кодировки не существует, то программа'
                       'будет работать неправильно!')
             if values[3] != USERNAME:
                 USERNAME = values[3]
                 config_change = True
-                print(f'ВНИМАНИЕ: ответственный изменён на {values[3]}')
+                print(f'ВНИМАНИЕ: ответственный изменён на {USERNAME}')
             if values[4] != TIME_ZONE:
-                if (values[4][0] != '+' and values[4][0] != '-' or 
-                    len(values[4][1:]) > 2 or not str(values[4][1:]).isdigit()):
-                    print('ЧАСОВОЙ ПОЯС ВВЕДЁН НЕВЕРНО! Часовой пояс должен'
-                          'начинаться со знака "+" или "-", и содержать'
+                if (values[4][0] != '+' and values[4][0] != '-' or
+                        len(values[4][1:]) > 2 or
+                        not str(values[4][1:]).isdigit()):
+                    print('ЧАСОВОЙ ПОЯС ВВЕДЁН НЕВЕРНО! Часовой пояс должен '
+                          'начинаться со знака "+" или "-", и содержать '
                           'только цифры!')
                 else:
                     config_change = True
                     TIME_ZONE = values[4]
-                    print(f'ВНИМАНИЕ: часовой пояс изменён на {values[4]}')
+                    print(f'ВНИМАНИЕ: часовой пояс изменён на {TIME_ZONE}')
             if values[5] != day:
                 day = values[5]
-                print(f'ВНИМАНИЕ: день создаваемого журнала изменён на {values[5]}!')
+                print('ВНИМАНИЕ: день создаваемого журнала изменён на '
+                      f'{day}!')
             if values[6] != START_INPUT_NUMBER:
                 if not str(values[6]).isdigit():
                     print('СТАРТОВЫЙ НОМЕР ВВЕДЁН НЕВЕРНО: он должен быть'
                           'числом!')
                 else:
                     START_INPUT_NUMBER = values[6]
-                    print(f'ВНИМАНИЕ: стартовый номер вхоядщих фалов изменён на {values[6]}!')
+                    print('ВНИМАНИЕ: стартовый номер вхоядщих фалов изменён '
+                          f'на {START_INPUT_NUMBER}!')
             if values[7] != START_OUTPUT_NUMBER:
                 if not str(values[7]).isdigit():
                     print('СТАРТОВЫЙ НОМЕР ВВЕДЁН НЕВЕРНО: он должен быть'
                           'числом!')
                 else:
                     START_OUTPUT_NUMBER = values[7]
-                    print(f'ВНИМАНИЕ: стартовый номер исходящих фалов изменён на {values[7]}!')
+                    print('ВНИМАНИЕ: стартовый номер исходящих фалов изменён '
+                          f'на {START_OUTPUT_NUMBER}!')
 
             # ищем подходящие Log-файлы
             print(f'Будет сформирован журнал за {day}')
-            log_config_file = LOG_CATALOG + 'wmail.cfg'     
+            log_config_file = LOG_CATALOG + 'wmail.cfg'
             logs = log_files(day, log_config_file)
             print('Используемые лог-файлы: ', *logs)
             # создаём 2 пустых множества: для входящих и исходящих файлов
@@ -230,7 +248,7 @@ if __name__ == '__main__':
             for name in logs:
                 # парсим log-файл, результат пишем в 2 разных множества
                 inp, out = parse_log(name, day)
-                # добавляем полученные из 1 log-файла данные в общие множества данных
+                # добавляем полученные из log-файлов данные в общие множества
                 input_set.update(inp)
                 output_set.update(out)
             # преобразуем множества в списки и сортируем
@@ -243,27 +261,29 @@ if __name__ == '__main__':
                 input_log, int(START_INPUT_NUMBER))
             output_log, START_OUTPUT_NUMBER = append_number_and_user(
                 output_log, int(START_OUTPUT_NUMBER))
-    
-            input_header = ['№',
-                            'Дата, время получения',
-                            'Имя массива или имя файла',
-                            'Отправитель',
-                            'ФИО, подпись лица, ответственного за получение']
-            output_header = ['№',
-                            'Дата, время отправки',
-                            'Имя массива или имя файла',
-                            'Получатель',
-                            'ФИО, подпись лица, ответственного за отправку']
-    
-            jrnl_input_name = JRNL_CATALOG + 'jnl-in_' + format_date(day) + '.xlsx'
-            jrnl_output_name = JRNL_CATALOG + 'jnl-out_' + format_date(day) + '.xlsx'
+
+            input_header = [
+                '№', 'Дата, время получения', 'Имя массива или имя файла',
+                'Отправитель', 'ФИО, подпись лица, ответственного за получение'
+            ]
+            output_header = [
+                '№', 'Дата, время отправки', 'Имя массива или имя файла',
+                'Получатель', 'ФИО, подпись лица, ответственного за отправку'
+            ]
+
+            jrnl_input_name = JRNL_CATALOG + 'jnl-in_'\
+                + format_date(day) + '.xlsx'
+            jrnl_output_name = JRNL_CATALOG + 'jnl-out_'\
+                + format_date(day) + '.xlsx'
 
             export_to_xls(jrnl_input_name, input_header, input_log)
             export_to_xls(jrnl_output_name, output_header, output_log)
-    
+
             # заносим новые значения в settings.ini
-            settings.set('Settings', 'start_input_number', str(START_INPUT_NUMBER))
-            settings.set('Settings', 'start_output_number', str(START_OUTPUT_NUMBER))
+            settings.set('Settings', 'start_input_number',
+                         str(START_INPUT_NUMBER))
+            settings.set('Settings', 'start_output_number',
+                         str(START_OUTPUT_NUMBER))
             if config_change:
                 settings.set('Settings', 'log_catalog', LOG_CATALOG)
                 settings.set('Settings', 'jrnl_catalog', JRNL_CATALOG)
